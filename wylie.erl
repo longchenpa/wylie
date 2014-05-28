@@ -1,6 +1,6 @@
 -module(wylie).
 -author("རྣམ་དག་སྟོན་པ").
--copyright("Longchen Nyingthig").
+-copyright("ཀློང་ཆེན་སྙིང་ཐིག").
 -compile(export_all).
 
 % Extended Wylie Tibetan Script EWTS UTF-8 Converter
