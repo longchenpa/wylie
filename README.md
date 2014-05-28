@@ -1,7 +1,7 @@
-Extedned Wylie Tibetam Script
+Extended Wylie Tibetam Script
 =============================
 
-Extedned Wylie Tibetam Script UTF-8 Encoder.
+EWTS UTF-8 Encoder.
 
 Usage
 -----
