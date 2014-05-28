@@ -1,4 +1,4 @@
-Extended Wylie Tibetam Script
+Extended Wylie Tibetan Script
 =============================
 
 EWTS UTF-8 Encoder.
