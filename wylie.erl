@@ -140,7 +140,7 @@ transcode({wylie,Text}) ->
 
 t(0,S,_,L,_) -> L;
 t(_,[],_,L,_) -> L;
-t(N,String,Dictionary,Letters,P) when P > 2 -> t(N,String,Dictionary,Letters,0); % clear stack
+t(N,String,Dictionary,Letters,P) when P > 4 -> t(N,String,Dictionary,Letters,0); % clear stack
 t(N,String,Dictionary,Letters,P) ->
     R = lists:keyfind(lists:sublist(String,N),1,Dictionary),
     case R of
@@ -150,15 +150,15 @@ t(N,String,Dictionary,Letters,P) ->
                 Value when Value == 16#0f0b -> {Value,5};
                 {A,B} -> case P of
                     0 -> {[A],P+1};
-                    1 -> {[B],2}; % TODO: stack more than one
-                    2 -> {[B],3};
-                    3 -> {[B],5} end;
+                    _ -> {[B],P+1}
+                end;
                 Value when Vowel andalso is_integer(Value) andalso P == 0 -> {[16#0F68,Value],P+1};
                 Value when is_list(Value) -> {Value,P+1};
                 Value when is_integer(Value) -> case Key of 
                     Value when P == 0 -> {[Value],P+1};
                     "a" -> {[],5};
-                    _ -> {[Value],5} end
+                    _ -> {[Value],5}
+                end
             end,
             case length(String) > N of
                 false -> [Letter|Letters];
