@@ -92,14 +92,14 @@ complex_vowels() -> [
 {"l-I",{[16#0f63,16#0f71,16#0f80],[16#0fb3,16#0f71,16#0f80]}}].
 
 final() -> [
-{"M",{1,16#0f7e,"M"}}, % anusvara / bindu / circle above / nga ro
-{"H",{1,16#0f7f,"H"}}, % visarga / rnam bcad
-{"~M`",{1,16#0f82,"M"}}, % crescent, bindu & nada
-{"~M",{1,16#0f83,"M"}}, % crescent & bindu
-{"?",{1,16#0f84,"?"}}, % halanta / srog med
-{"X",{1,16#0f37,"X"}}, % small circle under
-{"~X",{1,16#0f35,"X"}}, % small circle w/ crescent under
-{"^",{1,16#0f39,"^"}}]. % tsa-phru
+{"M",16#0f7e}, % anusvara / bindu / circle above / nga ro
+{"H",16#0f7f}, % visarga / rnam bcad
+{"~M`",16#0f82}, % crescent, bindu & nada
+{"~M",16#0f83}, % crescent & bindu
+{"?",16#0f84}, % halanta / srog med
+{"X",16#0f37}, % small circle under
+{"~X",16#0f35}, % small circle w/ crescent under
+{"^",16#0f39}]. % tsa-phru
 
 other() -> [
 {"0",16#0f20},
@@ -145,15 +145,20 @@ t(N,String,Dictionary,Letters,P) ->
     R = lists:keyfind(lists:sublist(String,N),1,Dictionary),
     case R of
         {Key,Value} ->
+            Vowel = is_vowel(Key),
             {Letter,Stack} = case Value of
                 Value when Value == 16#0f0b -> {Value,5};
                 {A,B} -> case P of
-                    0 -> {[A],1};
-                    1 -> {[B],5}; % TODO: stack more than one
-                    2 -> {[B],5};
+                    0 -> {[A],P+1};
+                    1 -> {[B],2}; % TODO: stack more than one
+                    2 -> {[B],3};
                     3 -> {[B],5} end;
+                Value when Vowel andalso is_integer(Value) andalso P == 0 -> {[16#0F68,Value],P+1};
                 Value when is_list(Value) -> {Value,P+1};
-                Value when is_integer(Value) -> case Key of "a" -> {[],5}; _ -> {[Value],5} end
+                Value when is_integer(Value) -> case Key of 
+                    Value when P == 0 -> {[Value],P+1};
+                    "a" -> {[],5};
+                    _ -> {[Value],5} end
             end,
             case length(String) > N of
                 false -> [Letter|Letters];
@@ -164,3 +169,10 @@ t(N,String,Dictionary,Letters,P) ->
 tibetan(Wylie) ->
     transcode({wylie,Wylie}).
 
+is_vowel(Char) -> lists:keyfind(Char,1,vowels()) /= false.
+
+tests() ->
+    "ཨོཾ་ཨཱཿ་ཧཱུྃ" = tibetan("oM AH hU~M"),
+    "ཀློང་ཆེན་སྙིང་ཐིག" = tibetan("klong chen snying thig"),
+    "རྣམ་དག་སྟོན་པ" = tibetan("rnam dag ston pa"),
+    ok.
