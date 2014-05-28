@@ -138,7 +138,7 @@ transcode({wylie,Text}) ->
 %    io:format("~ts~n",[Res]),
     lists:flatten(Res).
 
-t(0,S,_,L,_) -> L;
+t(0,_,_,L,_) -> L;
 t(_,[],_,L,_) -> L;
 t(N,String,Dictionary,Letters,P) when P > 4 -> t(N,String,Dictionary,Letters,0); % clear stack
 t(N,String,Dictionary,Letters,P) ->
