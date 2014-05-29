@@ -11,7 +11,7 @@ erl +pc unicode
 > c(wylie).
 {ok,wylie}
 > wylie:tibetan("klong chen snying thig").
-ཀློང་ཆེན་སྙིང་ཐིག
+"ཀློང་ཆེན་སྙིང་ཐིག"
 ```
 
 Credits
