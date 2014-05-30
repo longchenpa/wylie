@@ -135,7 +135,6 @@ transcode({wylie,Text}) ->
     Table = lists:flatten([
         constants(),vowels(),sanskrit_vowels(),complex_vowels(),final(),other()]),
     Res = lists:reverse(t(4,Text,Table,[],0)),
-%    io:format("~ts~n",[Res]),
     lists:flatten(Res).
 
 t(0,_,_,L,_) -> L;
