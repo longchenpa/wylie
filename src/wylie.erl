@@ -56,9 +56,9 @@ constants() -> [
 {"l",{16#0f63,16#0fb3}},
 {"sh",{16#0f64,16#0fb4}},
 {"Sh",{16#0f65,16#0fb5}},
-{"-sh",{16#0f65,16#0fb6}},
-{"s",{16#0f66,16#0fb7}},
-{"h",{16#0f67,16#0fb8}},
+{"-sh",{16#0f65,16#0fb5}},
+{"s",{16#0f66,16#0fb6}},
+{"h",{16#0f67,16#0fb7}},
 {"W",{16#0f5d,16#0fba}},
 {"Y",{16#0f61,16#0fbb}},
 {"R",{16#0f6a,16#0fbc}},
@@ -120,6 +120,7 @@ other() -> [
 {"|",16#0f11},
 {"!",16#0f08},
 {":",16#0f14},
+{"+",""},
 {"_"," "},
 {"=",16#0f34},
 {"<",16#0f3a},
@@ -137,11 +138,12 @@ transcode({wylie,Text}) ->
     Res = lists:reverse(t(4,Text,Table,[],0)),
     lists:flatten(Res).
 
-t(0,_,_,L,_) -> L;
+t(0,String,Dictionary,Letters,P) -> t(4,tl(String),Dictionary,[hd(String)|Letters],0);
 t(_,[],_,L,_) -> L;
 t(N,String,Dictionary,Letters,P) when P > 4 -> t(N,String,Dictionary,Letters,0); % clear stack
 t(N,String,Dictionary,Letters,P) ->
     R = lists:keyfind(lists:sublist(String,N),1,Dictionary),
+    io:format("R: ~p~n",[R]),
     case R of
         {Key,Value} ->
             Vowel = is_vowel(Key),
