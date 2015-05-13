@@ -143,7 +143,7 @@ t(_,[],_,L,_) -> L;
 t(N,String,Dictionary,Letters,P) when P > 4 -> t(N,String,Dictionary,Letters,0); % clear stack
 t(N,String,Dictionary,Letters,P) ->
     R = lists:keyfind(lists:sublist(String,N),1,Dictionary),
-    io:format("R: ~p~n",[R]),
+    %io:format("R: ~p~n",[R]),
     case R of
         {Key,Value} ->
             Vowel = is_vowel(Key),
