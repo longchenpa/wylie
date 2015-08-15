@@ -138,30 +138,27 @@ transcode({wylie,Text}) ->
     Res = lists:reverse(t(4,Text,Table,[],0)),
     lists:flatten(Res).
 
-t(0,String,Dictionary,Letters,P) -> t(4,tl(String),Dictionary,[hd(String)|Letters],0);
+%   io:format("N: ~p S: ~p P: ~p R: ~p~n",[N,String,P,R]),
+
+t(0,String,Dictionary,Letters,_) -> t(4,tl(String),Dictionary,[hd(String)|Letters],0);
 t(_,[],_,L,_) -> L;
 t(N,String,Dictionary,Letters,P) when P > 4 -> t(N,String,Dictionary,Letters,0); % clear stack
 t(N,String,Dictionary,Letters,P) ->
     R = lists:keyfind(lists:sublist(String,N),1,Dictionary),
-%    io:format("N: ~p S: ~p P: ~p R: ~p~n",[N,String,P,R]),
     case R of
         {Key,Value} ->
             Vowel = is_vowel(Key),
             {Letter,Stack} = case Value of
                 Value when Value == 16#0f0b -> {Value,5};
-                {A,B} -> case P of
-                    0 -> {[A],P+1};
-                    _ -> {[B],P+1}
-                end;
+                {A,B} -> case P of 0 -> {[A],P+1}; _ -> {[B],P+1} end;
                 Value when Key == "_" -> {[Value],P};
-                Value when Vowel andalso is_integer(Value) andalso Key == "a" andalso P == 0 -> {[Value],P};
-                Value when Vowel andalso is_integer(Value) andalso P == 0 -> {[16#0F68,Value],P+1};
-                Value when is_list(Value) -> {Value,P+1};
-                Value when is_integer(Value) -> case Key of
-                    Value when P == 0 -> {[Value],P+1};
-                    "a" -> {[],5};
-                    _ -> {[Value],5}
-                end
+                Value when is_integer(Value) ->
+                      case Key of "a"   when P == 0 andalso Vowel -> {[Value],P};
+                                  _____ when P == 0 andalso Vowel -> {[16#0F68,Value],P+1};
+                                  Value when P == 0 -> {[Value],P+1};
+                                  "a"   -> {[],5};
+                                  _____ -> {[Value],5} end;
+                Value when is_list(Value) -> {Value,P+1}
             end,
             case length(String) > N of
                 false -> [Letter|Letters];
@@ -169,13 +166,21 @@ t(N,String,Dictionary,Letters,P) ->
                             Dictionary,[Letter|Letters],Stack) end;
         false -> t(N-1,String,Dictionary,Letters,P) end.
 
+tests() ->
+    "ཨོཾ་ཨཱཿ་ཧཱུྃ"      = tibetan("oM AH hU~M"),
+    "ཀློང་ཆེན་སྙིང་ཐིག" = tibetan("klong chen snying thig"),
+    "རྣམ་དག་སྟོན་པ"     = tibetan("rnam dag ston pa"),
+    "ཨོཾ་ཨརྒྷཾ་པདྱཾ་པུཥྤེ་དྷུཔྤེ་ཨ་ལོ་ཀེ་གནྡྷེ་ནཻ་ཝིཏྱེ་ཤབྟ་པྲ་ཏིཙྪ་ཡེ་སྭཱ་ཧཱ༔" =
+        wylie:tibetan("oM ar+g+haM pad+yaM puSh+pe d+hup+pe a lo ke gan+d+he nai wit+ye shab+ta pra tits+tsha ye swA hA:"),
+    "ཏདྱ་ཐཱ༔ ཨོཾ་མུ་ནེ་མུ་ནེ་མ་ཧཱ་མུ་ནེ་ཤཱཀྱ་མུ་ནེ་ཡེ་སྭཱ་ཧཱ༔" =
+        wylie:tibetan("tad+ya thA:_oM mu ne mu ne ma hA mu ne shAkya mu ne ye swA hA:"),
+    "བཛྲ་ས་མ་ཡཱ་ཛ༔ ཛ༔་ཧཱུྃ་བཾ་ཧོ༔ པདྨ་ཀ་མ་ལ་ཡེ་སྟྭཾ༔" =
+        wylie:tibetan("badz+ra sa ma yA dza:_dza: hU~M baM ho:_pad+ma ka ma la ye stwaM:"),
+    "ཨོཾ་ཡེ་དྷརྨཱ་ཧེ་ཏུ་པྲ་བྷ་ཝཱ་ཧེ་ཏུན་ཏེ་ཥནྟ་ཐཱ་ག་ཏོ་ཧྱ་ཝ་དཏ" =
+        wylie:tibetan("oM ye d+har+mA he tu pra b+ha wA he tun te Shan+ta thA ga to ha+ya wa data"), ok.
+
 tibetan(Wylie) ->
     transcode({wylie,Wylie}).
 
 is_vowel(Char) -> lists:keyfind(Char,1,vowels()) /= false.
 
-tests() ->
-    "ཨོཾ་ཨཱཿ་ཧཱུྃ" = tibetan("oM AH hU~M"),
-    "ཀློང་ཆེན་སྙིང་ཐིག" = tibetan("klong chen snying thig"),
-    "རྣམ་དག་སྟོན་པ" = tibetan("rnam dag ston pa"),
-    ok.
