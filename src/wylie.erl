@@ -143,7 +143,7 @@ t(_,[],_,L,_) -> L;
 t(N,String,Dictionary,Letters,P) when P > 4 -> t(N,String,Dictionary,Letters,0); % clear stack
 t(N,String,Dictionary,Letters,P) ->
     R = lists:keyfind(lists:sublist(String,N),1,Dictionary),
-    %io:format("R: ~p~n",[R]),
+%    io:format("N: ~p S: ~p P: ~p R: ~p~n",[N,String,P,R]),
     case R of
         {Key,Value} ->
             Vowel = is_vowel(Key),
@@ -153,10 +153,11 @@ t(N,String,Dictionary,Letters,P) ->
                     0 -> {[A],P+1};
                     _ -> {[B],P+1}
                 end;
+                Value when Key == "_" -> {[Value],P};
                 Value when Vowel andalso is_integer(Value) andalso Key == "a" andalso P == 0 -> {[Value],P};
                 Value when Vowel andalso is_integer(Value) andalso P == 0 -> {[16#0F68,Value],P+1};
                 Value when is_list(Value) -> {Value,P+1};
-                Value when is_integer(Value) -> case Key of 
+                Value when is_integer(Value) -> case Key of
                     Value when P == 0 -> {[Value],P+1};
                     "a" -> {[],5};
                     _ -> {[Value],5}
