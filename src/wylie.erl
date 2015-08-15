@@ -153,6 +153,7 @@ t(N,String,Dictionary,Letters,P) ->
                     0 -> {[A],P+1};
                     _ -> {[B],P+1}
                 end;
+                Value when Vowel andalso is_integer(Value) andalso Key == "a" andalso P == 0 -> {[Value],P};
                 Value when Vowel andalso is_integer(Value) andalso P == 0 -> {[16#0F68,Value],P+1};
                 Value when is_list(Value) -> {Value,P+1};
                 Value when is_integer(Value) -> case Key of 
