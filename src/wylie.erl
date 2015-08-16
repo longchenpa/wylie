@@ -6,12 +6,17 @@
 % Extended Wylie Tibetan Script EWTS UTF-8 Converter
 
 constants() -> [
-{"kh",{16#0f41,16#0f91}},
 {"k",{16#0f40,16#0f90}},
+{"kh",{16#0f41,16#0f91}},
 {"g",{16#0f42,16#0f92}},
+{"gc",{[16#0f42,16#0f45],[16#0f92,16#0f95]}},
+{"gd",{[16#0f42,16#0f51],[16#0f92,16#0fa1]}},
+{"gn",{[16#0f42,16#0f53],[16#0f92,16#0fa3]}},
+{"gny",{[16#0f42,16#0f49],[16#0f92,16#0f99]}},
 {"gh",{[16#0f42,16#0fb7],[16#0f92,16#0fb7]}},
+{"gz",{[16#0f42,16#0f5f],[16#0f92,16#0faf]}},
+{"gs",{[16#0f42,16#0f66],[16#0f92,16#0fb6]}},
 {"g+h",{[16#0f42,16#0fb7],[16#0f92,16#0fb7]}},
-{"ng",{16#0f44,16#0f94}},
 {"c",{16#0f45,16#0f95}},
 {"ch",{16#0f46,16#0f96}},
 {"j",{16#0f47,16#0f97}},
@@ -31,20 +36,33 @@ constants() -> [
 {"t",{16#0f4f,16#0f9f}},
 {"th",{16#0f50,16#0fa0}},
 {"d",{16#0f51,16#0fa1}},
+{"db",{[16#0f51,16#0f56],[16#0fa1,16#0fa6]}},
 {"dh",{[16#0f51,16#0fb7],[16#0fa1,16#0fb7]}},
+{"dk",{[16#0f5b,16#0f40],[16#0fab,16#0f90]}},
 {"d+h",{[16#0f51,16#0fb7],[16#0fa1,16#0fb7]}},
-{"n",{16#0f53,16#0fa3}},
-{"p",{16#0f54,16#0fa4}},
-{"ph",{16#0f55,16#0fa5}},
-{"b",{16#0f56,16#0fa6}},
-{"bh",{[16#0f56,16#0fb7],[16#0fa6,16#0fb7]}},
-{"b+h",{[16#0f56,16#0fb7],[16#0fa6,16#0fb7]}},
-{"m",{16#0f58,16#0fa8}},
-{"ts",{16#0f59,16#0fa9}},
-{"tsh",{16#0f5a,16#0faa}},
+{"dg",{[16#0f51,16#0f42],[16#0fa1,16#0f92]}},
 {"dz",{16#0f5b,16#0fab}},
 {"dzh",{[16#0f5b,16#0fb7],[16#0fab,16#0fb7]}},
 {"dz+h",{[16#0f5b,16#0fb7],[16#0fab,16#0fb7]}},
+{"n",{16#0f53,16#0fa3}},
+{"ngs",{[16#0f44,16#0f66],[16#0f94,16#0fb6]}},
+{"ng",{16#0f44,16#0f94}},
+{"p",{16#0f54,16#0fa4}},
+{"ph",{16#0f55,16#0fa5}},
+{"b",{16#0f56,16#0fa6}},
+{"bc",{[16#0f56,16#0f45],[16#0fa6,16#0f95]}},
+{"bs",{[16#0f56,16#0f66],[16#0fa6,16#0fb6]}},
+{"bd",{[16#0f56,16#0f51],[16#0fa6,16#0fa1]}},
+{"bh",{[16#0f56,16#0fb7],[16#0fa6,16#0fb7]}},
+{"bz",{[16#0f56,16#0f5f],[16#0fa6,16#0faf]}},
+{"b+h",{[16#0f56,16#0fb7],[16#0fa6,16#0fb7]}},
+{"bzh",{[16#0f56,16#0f5e],[16#0fa6,16#0fae]}},
+{"brg",{[16#0f56,16#f62,16#f92],[16#0fa6,16#0fb2,16#f92]}},
+{"m",{16#0f58,16#0fa8}},
+{"mkh",{[16#0f58,16#0f41],[16#0fa8,16#0f91]}},
+{"ms",{[16#0f58,16#0f66],[16#0fa8,16#0fb6]}},
+{"ts",{16#0f59,16#0fa9}},
+{"tsh",{16#0f5a,16#0faa}},
 {"w",{16#0f5d,16#0fad}},
 {"zh",{16#0f5e,16#0fae}},
 {"z",{16#0f5f,16#0faf}},
@@ -69,6 +87,10 @@ vowels() -> [
 {"a",16#0F68}, % a-chen
 {"A",16#0f71},
 {"i",16#0f72},
+{"'i",[16#0f60,16#0f72]},
+{"+'i",16#0f72},
+{"'u",[16#0f60,16#0f74]},
+{"'a",16#0f71},
 {"I",[16#0f71,16#0f72]},
 {"u",16#0f74},
 {"U",[16#0f71,16#0f74]},
@@ -122,6 +144,7 @@ other() -> [
 {":",16#0f14},
 {"+",""},
 {"_"," "},
+{".",""},
 {"=",16#0f34},
 {"<",16#0f3a},
 {">",16#0f3b},
@@ -138,20 +161,25 @@ transcode({wylie,Text}) ->
     Res = lists:reverse(t(4,Text,Table,[],0)),
     lists:flatten(Res).
 
-%   io:format("N: ~p S: ~p P: ~p R: ~p~n",[N,String,P,R]),
 
 t(0,String,Dictionary,Letters,_) -> t(4,tl(String),Dictionary,[hd(String)|Letters],0);
 t(_,[],_,L,_) -> L;
 t(N,String,Dictionary,Letters,P) when P > 4 -> t(N,String,Dictionary,Letters,0); % clear stack
 t(N,String,Dictionary,Letters,P) ->
     R = lists:keyfind(lists:sublist(String,N),1,Dictionary),
+%   io:format("N: ~p S: ~p P: ~p R: ~p L: ~p~n",[N,String,P,R,Letters]),
     case R of
         {Key,Value} ->
             Vowel = is_vowel(Key),
             {Letter,Stack} = case Value of
                 Value when Value == 16#0f0b -> {Value,5};
-                {A,B} -> case P of 0 -> {[A],P+1}; _ -> {[B],P+1} end;
+                Value when Key == "." -> {Value,5};
                 Value when Key == "_" -> {[Value],P};
+                {A,B} -> case P of 0 when Key == "'" -> {[A],5};
+                                   0 -> {[A],P+1};
+                                   _ when Key == "'" -> {[B],5};
+                                   _ -> {[B],P+1} end;
+%                {A,B} -> case P of 0 -> when Key == "'" andalso P == 0 -> {[A],5}; _ -> {[B],5} end;
                 Value when is_integer(Value) ->
                       case Key of "a"   when P == 0 andalso Vowel -> {[Value],P};
                                   _____ when P == 0 andalso Vowel -> {[16#0F68,Value],P+1};
