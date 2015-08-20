@@ -1,0 +1,8 @@
+{application, wylie, [
+    {description,  "EWTS Wylie"},
+    {vsn,          "0.1"},
+    {applications, [kernel, stdlib]},
+    {modules, []},
+    {registered,   []},
+    {env, []}
+]}.
