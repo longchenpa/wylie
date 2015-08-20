@@ -38,6 +38,7 @@ constants() -> [
 {"t",{16#0f4f,16#0f9f}},
 {"th",{16#0f50,16#0fa0}},
 {"d",{16#0f51,16#0fa1}},
+{"dm",{[16#0f51,16#0f58],[16#0fa1,16#0fa8]}},
 {"db",{[16#0f51,16#0f56],[16#0fa1,16#0fa6]}},
 {"dng",{[16#0f51,16#0f44],[16#0fa1,16#0f94]}},
 {"dh",{[16#0f51,16#0fb7],[16#0fa1,16#0fb7]}},
@@ -55,6 +56,8 @@ constants() -> [
 {"p",{16#0f54,16#0fa4}},
 {"ph",{16#0f55,16#0fa5}},
 {"b",{16#0f56,16#0fa6}},
+{"bt",{[16#0f56,16#0f4f],[16#0fa6,16#0f9f]}},
+{"bsh",{[16#0f56,16#0f64],[16#0fa6,16#0fb4]}},
 {"bk",{[16#0f56,16#0f40],[16#0fa6,16#0f40]}},
 {"bts",{[16#0f56,16#0f59],[16#0fa6,16#0fa9]}},
 {"bc",{[16#0f56,16#0f45],[16#0fa6,16#0f95]}},
@@ -65,10 +68,13 @@ constants() -> [
 {"b+h",{[16#0f56,16#0fb7],[16#0fa6,16#0fb7]}},
 {"bzh",{[16#0f56,16#0f5e],[16#0fa6,16#0fae]}},
 {"brg",{[16#0f56,16#f62,16#f92],[16#0fa6,16#0fb2,16#f92]}},
+{"brt",{[16#0f56,16#f62,16#f9f],[16#0fa6,16#0fb2,16#f9f]}},
+{"brd",{[16#0f56,16#f62,16#fa1],[16#0fa6,16#0fb2,16#fa1]}},
 {"brts",{[16#0f56,16#f62,16#0fa9],[16#0fa6,16#0fb2,16#0fa9]}},
 {"m",{16#0f58,16#0fa8}},
 {"mny",{[16#0f58,16#0f49],[16#0fa8,16#0f99]}},
 {"mg",{[16#0f58,16#0f42],[16#0fa8,16#0f92]}},
+{"mng",{[16#0f58,16#0f44],[16#0fa8,16#0f94]}},
 {"mch",{[16#0f58,16#0f46],[16#0fa8,16#0f96]}},
 {"mkh",{[16#0f58,16#0f41],[16#0fa8,16#0f91]}},
 {"mth",{[16#0f58,16#0f50],[16#0fa8,16#0fa0]}},
@@ -103,6 +109,7 @@ vowels() -> [
 {"A",16#0f71},
 {"i",16#0f72},
 {"'i",[16#0f60,16#0f72]},
+{"'o",[16#0f60,16#0f7c]},
 {"+'i",16#0f72},
 {"'u",[16#0f60,16#0f74]},
 {"'a",16#0f71},
@@ -182,22 +189,24 @@ t(_,[],_,L,_) -> L;
 t(N,String,Dictionary,Letters,P) when P > 4 -> t(N,String,Dictionary,Letters,0); % clear stack
 t(N,String,Dictionary,Letters,P) ->
     R = lists:keyfind(lists:sublist(String,N),1,Dictionary),
-%   io:format("N: ~p S: ~p P: ~p R: ~p L: ~p~n",[N,String,P,R,Letters]),
     case R of
         {Key,Value} ->
+            %io:format("N: ~p S: ~p P: ~p R: ~p L: ~p Key: ~p~n",[N,String,P,R,Letters,Key]),
             Vowel = is_vowel(Key),
             {Letter,Stack} = case Value of
-                Value when Value == 16#0f0b -> {Value,5};
-                Value when Key == "." -> {Value,5};
-                Value when Key == "_" -> {[Value],P};
+                Value when Value   == 16#0f0b -> {Value,5};
+                Value when Key     == "."     -> {Value,5};
+                Value when Key     == "_"     -> {[Value],P};
                 {A,B} -> case P of 0 when Key == "'" -> {[A],5};
+                                   0 when hd(Key) == $' -> {[A],5};
                                    0 -> {[A],P+1};
                                    _ when Key == "'" -> {[B],5};
+                                   _ when hd(Key) == $' -> {[B],5};
                                    _ -> {[B],P+1} end;
-%                {A,B} -> case P of 0 -> when Key == "'" andalso P == 0 -> {[A],5}; _ -> {[B],5} end;
+                Value when hd(Key) == $' -> {[Value],5};
                 Value when is_integer(Value) ->
-                      case Key of "a"   when P == 0 andalso Vowel -> {[Value],P};
-                                  _____ when P == 0 andalso Vowel -> {[16#0F68,Value],P+1};
+                      case Key of "a"   when P == 0 andalso Vowel -> {[Value],5};
+                                  _____ when P == 0 andalso Vowel -> {[16#0F68,Value],5};
                                   Value when P == 0 -> {[Value],P+1};
                                   "a"   -> {[],5};
                                   _____ -> {[Value],5} end;
